@@ -9,5 +9,7 @@ int main(int argn, char** args)
 
    controller->PrintUI();
 
+
+   getchar();
    return 0;
 }
