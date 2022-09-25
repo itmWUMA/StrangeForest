@@ -9,6 +9,8 @@ using namespace std;
 class Controller
 {
 public:
+
+   // 获取单例
    static Controller *GetInstance()
    {
       if (instance == nullptr)
@@ -16,9 +18,18 @@ public:
       return instance;
    }
 
+   // 打印界面
    void PrintUI()
    {
       
+   }
+
+   // 获取用户输入
+   int GetInput()
+   {
+      int ipt = 0;
+      cin >> ipt;
+      return ipt;
    }
 
 private:
