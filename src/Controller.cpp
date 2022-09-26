@@ -1,4 +1,4 @@
-// 控制类，用于UI显示以及游戏核心逻辑控制
+// 控制类：用于UI显示以及游戏核心逻辑控制
 
 #ifndef __CONTROLLER__
 #define __CONTROLLER__
