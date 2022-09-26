@@ -3,6 +3,7 @@
         "system_error": "cpp",
         "xmemory": "cpp",
         "xstring": "cpp",
-        "memory": "cpp"
+        "memory": "cpp",
+        "vector": "cpp"
     }
 }

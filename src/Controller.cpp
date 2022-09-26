@@ -3,13 +3,13 @@
 #ifndef __CONTROLLER__
 #define __CONTROLLER__
 
+#include "Map.cpp"
 #include <iostream>
 using namespace std;
 
 class Controller
 {
 public:
-
    // 获取单例
    static Controller *GetInstance()
    {
@@ -21,6 +21,15 @@ public:
    // 打印界面
    void PrintUI()
    {
+      cout << "            Strange Forest" << endl;
+      cout << "=======================================" << endl;
+
+      // 打印地图
+      map.PrintMap();
+
+      cout << "=======================================" << endl;
+
+      // 打印玩家信息
       
    }
 
@@ -33,9 +42,15 @@ public:
    }
 
 private:
+   // 单例
    static Controller *instance;
+   // 游戏地图
+   Map map;
 
-   Controller() {}
+   Controller()
+   {
+   }
+
    Controller(const Controller &) {}
 };
 
