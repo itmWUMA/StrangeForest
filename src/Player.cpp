@@ -29,5 +29,6 @@ private:
     Player(pair<int, int> pos = {0, 0}, int hp = 10) : pos(pos), hp(hp) {}
     Player(const Player& p) {}
 };
+Player* Player::instance = nullptr;
 
 #endif

@@ -5,6 +5,7 @@
         "xstring": "cpp",
         "memory": "cpp",
         "vector": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "iostream": "cpp"
     }
 }

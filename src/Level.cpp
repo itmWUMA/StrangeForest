@@ -9,49 +9,54 @@
 #include <vector>
 using namespace std;
 
-// 关卡信息，记录关卡的信息，以便于解析
-struct LevelInfo
+// 关卡接口，派生关卡需实现内部方法
+class ILevel
 {
+public:
     // 出口位置
     pair<int, int> exitPos;
     // 玩家信息
     Player *player;
     // 敌人信息
-    vector<IEnemy *> enemies;
+    vector<IEnemy *> enemyList;
     // 道具信息
-    vector<ICollection *> collections;
-};
+    vector<ICollection *> collectionList;
 
-// 关卡接口，派生关卡需实现内部方法
-class ILevel
-{
-public:
-    virtual LevelInfo GenerateInfo();
+    // 合成关卡
+    void ComposeLevel()
+    {
+        InitBasicData();
+        AddEnemy();
+        AddCollection();
+    }
+
+    virtual ~ILevel() {}
 
 protected:
     // 设置关卡的基本信息（如玩家位置、出口位置等）
-    virtual void InitBasicData();
+    virtual void InitBasicData() = 0;
 
     // 添加敌人
-    virtual void AddEnemy();
+    virtual void AddEnemy() = 0;
 
     // 添加道具
-    virtual void AddCollection();
+    virtual void AddCollection() = 0;
 };
 
 class Level_0 : public ILevel
 {
 public:
-    virtual LevelInfo GenerateInfo() override
+    ~Level_0()
     {
-        return info;
+        delete player;
+        player = nullptr;
     }
 
 protected:
     virtual void InitBasicData() override
     {
-        info.player = Player::GetInstance();
-        info.exitPos = make_pair(19, 19);
+        player = Player::GetInstance();
+        exitPos = make_pair(19, 19);
     }
 
     virtual void AddEnemy() override
@@ -63,9 +68,6 @@ protected:
     {
 
     }
-    
-private:
-    LevelInfo info;
 };
 
 #endif
