@@ -4,6 +4,7 @@
         "xmemory": "cpp",
         "xstring": "cpp",
         "memory": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "utility": "cpp"
     }
 }
