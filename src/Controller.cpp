@@ -61,20 +61,20 @@ public:
       // 更改状态
       status = GAMEING;
 
-      // 打印场景
-      PrintUI();
-
-      // 获取输入
-      int ipt = GetInput();
-
-      // 执行当前回合
-      DoProcess(ipt);
-
-      // 结果判断
-      switch (status)
+      // 游戏进行逻辑
+      while (status == GAMEING)
       {
+         // 打印场景
+         PrintUI();
 
+         // 获取输入
+         int ipt = GetInput();
+
+         // 执行当前回合
+         DoProcess(ipt);
       }
+
+
       
       // 关卡变化
    }
@@ -153,8 +153,15 @@ private:
       
       // 玩家移动控制
       Move(player->pos.first, player->pos.second, (Towards)ipt, player->step, player->SYMBOL);
+      --player->hp;
 
       // 敌人移动控制
+
+      // 结果判断
+      switch (status)
+      {
+
+      }
    }
 
    // 打印提示信息
@@ -192,13 +199,15 @@ private:
    }
 
    // 游戏对象移动
-   void Move(int x, int y, Towards towards, int step, char symbol)
+   void Move(int& x, int& y, Towards towards, int step, char symbol)
    {
       auto nextPos = GetNextPos_Unchecked(x, y, towards, step);
       if (!map.IsOutOfRange(nextPos.first, nextPos.second))
       {
          map.SetValue(x, y, ' ');
          map.SetValue(nextPos.first, nextPos.second, symbol);
+         x = nextPos.first;
+         y = nextPos.second;
       }
    }
 
