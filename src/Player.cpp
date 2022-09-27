@@ -13,6 +13,8 @@ public:
     pair<int, int> pos;
     // 生命（剩余移动步数）
     int hp;
+    // 单次移动距离
+    int step;
     // 代表符号
     const char SYMBOL = 'I'; 
 
@@ -26,7 +28,8 @@ public:
 private:
     static Player* instance;
 
-    Player(pair<int, int> pos = {0, 0}, int hp = 10) : pos(pos), hp(hp) {}
+    Player(pair<int, int> pos = {0, 0}, int hp = 10, int step = 1) : 
+        pos(pos), hp(hp), step(step) {}
     Player(const Player& p) {}
 };
 Player* Player::instance = nullptr;

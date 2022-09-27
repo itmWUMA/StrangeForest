@@ -26,7 +26,7 @@ int main(int argn, char** args)
          ctrl->EndGame();
    } while (ipt);
    
-
+   ctrl->DeleteInstance();
    system("pause");
    return 0;
 }

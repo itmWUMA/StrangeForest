@@ -56,19 +56,25 @@ public:
    void StartLevel()
    {
       // 加载关卡
-      
+      LoadLevel();
+
+      // 更改状态
+      status = GAMEING;
 
       // 打印场景
-
+      PrintUI();
 
       // 获取输入
-
+      int ipt = GetInput();
 
       // 执行当前回合
-
+      DoProcess(ipt);
 
       // 结果判断
+      switch (status)
+      {
 
+      }
       
       // 关卡变化
    }
@@ -96,9 +102,19 @@ private:
       GAMEING,    // 游戏中
       UNSTART,    // 未开始 
       PASS,       // 通关
+      FAIL,       // 失败
       FINISH,     // 结束
    };
    Status status;
+
+   // 移动朝向
+   enum Towards
+   {
+      UP = 1,
+      DOWN,
+      LEFT,
+      RIGHT,
+   };
 
    Controller() : curLevelIndex(0), status(UNSTART)
    {
@@ -107,6 +123,9 @@ private:
    }
 
    Controller(const Controller &) {}
+
+   // 获取当前关卡
+   inline ILevel* GetCurLevel() { return levelList[curLevelIndex]; }
 
    // 创建关卡
    ILevel* GenerateLevel(ILevel* &&level) 
@@ -118,13 +137,24 @@ private:
    // 加载关卡
    void LoadLevel()
    {
+      // 读取当前关卡
       auto curLevel = levelList[curLevelIndex];
+
+      // 初始化地图
+      map.SetValue(curLevel->exitPos.first, curLevel->exitPos.second, 'E');
+      map.SetValue(curLevel->player->pos.first, curLevel->player->pos.second, 'I');
    }
 
    // 执行当前回合
    void DoProcess(int ipt)
    {
+      auto curLevel = GetCurLevel();
+      auto player = curLevel->player;
+      
+      // 玩家移动控制
+      Move(player->pos.first, player->pos.second, (Towards)ipt, player->step, player->SYMBOL);
 
+      // 敌人移动控制
    }
 
    // 打印提示信息
@@ -135,6 +165,7 @@ private:
       case GAMEING:
          cout << "      Your time is limited\n   escape as quick as possible!" << endl;
          cout << "          [Rest Step : " << levelList[curLevelIndex]->player->hp << "]\n";
+         cout << "  [1] Up   [2] Down  [3] Left  [4] Right" << endl;
          break;
 
       case UNSTART:
@@ -142,6 +173,12 @@ private:
          break;
 
       case PASS:
+         cout << "      You are SAFE now!" << endl;
+         cout << "         [1] Continue    [0] End" << endl;
+         break;
+
+      case FAIL:
+         cout << "      YOU FAIL!" << endl;
          cout << "         [1] Continue    [0] End" << endl;
          break;
 
@@ -152,7 +189,40 @@ private:
       default:
          break;
       }
-      
+   }
+
+   // 游戏对象移动
+   void Move(int x, int y, Towards towards, int step, char symbol)
+   {
+      auto nextPos = GetNextPos_Unchecked(x, y, towards, step);
+      if (!map.IsOutOfRange(nextPos.first, nextPos.second))
+      {
+         map.SetValue(x, y, ' ');
+         map.SetValue(nextPos.first, nextPos.second, symbol);
+      }
+   }
+
+   // 根据移动获取下一个位置（不进行位置合理性检查）
+   pair<int, int> GetNextPos_Unchecked(int x, int y, Towards towards, int step)
+   {
+      auto nextPos = make_pair(x, y);
+      switch (towards)
+      {
+      case UP:
+         nextPos.first -= step;
+         break;
+      case DOWN:
+         nextPos.first += step;
+         break;
+      case LEFT:
+         nextPos.second -= step;
+         break;
+      case RIGHT:
+         nextPos.second += step;
+      default:
+         break;
+      }
+      return nextPos;
    }
 };
 Controller *Controller::instance = nullptr;
