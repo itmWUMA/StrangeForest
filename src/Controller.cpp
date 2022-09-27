@@ -127,6 +127,9 @@ private:
    // 获取当前关卡
    inline ILevel* GetCurLevel() { return levelList[curLevelIndex]; }
 
+   // 获取玩家
+   inline Player* GetPlayer() { return GetCurLevel()->player; }
+
    // 创建关卡
    ILevel* GenerateLevel(ILevel* &&level) 
    {
@@ -149,7 +152,7 @@ private:
    void DoProcess(int ipt)
    {
       auto curLevel = GetCurLevel();
-      auto player = curLevel->player;
+      auto player = GetPlayer();
       
       // 玩家移动控制
       Move(player->pos.first, player->pos.second, (Towards)ipt, player->step, player->SYMBOL);
@@ -157,11 +160,8 @@ private:
 
       // 敌人移动控制
 
-      // 结果判断
-      switch (status)
-      {
-
-      }
+      // 判定当前回合结果
+      JudgeResult();
    }
 
    // 打印提示信息
@@ -232,6 +232,20 @@ private:
          break;
       }
       return nextPos;
+   }
+
+   // 判断当前回合结果
+   void JudgeResult()
+   {
+      auto curLevel = GetCurLevel();
+      auto player = GetPlayer();
+
+      // 到达出口
+      if (player->pos == curLevel->exitPos)
+         status = PASS;
+      // 步数用完 或 遭遇敌人
+      else if (player->hp <= 0)
+         status = FAIL;
    }
 };
 Controller *Controller::instance = nullptr;
