@@ -3,6 +3,7 @@
 #ifndef __MAP__
 #define __MAP__
 
+#include "Player.cpp"
 #include <vector>
 #include <iostream>
 using namespace std;
@@ -40,17 +41,36 @@ public:
     // 打印地图
     void PrintMap()
     {
+        // 计算可见区域
         int row = grid.size(), col = grid[0].size();
+        auto player = Player::GetInstance();
+        auto playerPos = player->pos;
+        int visibleLeft = playerPos.second - player->sight, 
+            visibleRight = playerPos.second + player->sight, 
+            visibleDown = playerPos.first + player->sight, 
+            visibleUp = playerPos.first - player->sight;      
+
+        // 打印地图
         for (int i = 0; i < row; ++i)
         {
             for (int j = 0; j < col; ++j)
-                cout << grid[i][j] << ' ';
+            {
+                // 在可见区域
+                if (i >= visibleUp && i <= visibleDown && j >= visibleLeft && j <= visibleRight)
+                    cout << grid[i][j] << ' ';
+                // 不在可见区域
+                else
+                    cout << FOG << ' ';
+            }
             cout << endl;
         }
     }
 
 private:
     vector<vector<char>> grid;
+
+    // 迷雾标志
+    const char FOG = '-';
 };
 
 #endif
