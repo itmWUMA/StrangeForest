@@ -3,28 +3,12 @@
 #ifndef __LEVEL__
 #define __LEVEL__
 
+#include "Collection.cpp"
+#include "Info.cpp"
 #include "Player.cpp"
 #include "Enemy.cpp"
-#include "Collection.cpp"
 #include <vector>
 using namespace std;
-
-struct PlayerInfo
-{
-    // 位置
-    pair<int, int> pos;
-    // 生命（剩余移动步数）
-    int hp;
-    // 单次移动距离
-    int step;
-    // 视野范围
-    int sight;
-
-    PlayerInfo(pair<int, int> pos, int hp, int step, int sight) :
-        pos(pos), hp(hp), step(step), sight(sight) {}
-    PlayerInfo() :
-        pos({0, 0}), hp(10), step(1), sight(3) {}
-};
 
 // 关卡接口，派生关卡需实现内部方法
 class ILevel
@@ -35,7 +19,7 @@ public:
     // 玩家信息
     PlayerInfo playerInfo;
     // 敌人信息
-    vector<IEnemy *> enemyList;
+    vector<EnemyInfo*> enemyInfoList;
     // 道具信息
     vector<ICollection *> collectionList;
 
@@ -47,7 +31,16 @@ public:
         AddCollection();
     }
 
-    virtual ~ILevel() {}
+    virtual ~ILevel() 
+    {
+        // 释放敌人信息
+        for (EnemyInfo* info : enemyInfoList)
+            delete info;
+
+        // 释放道具
+        for (ICollection* collection : collectionList)
+            delete collection;
+    }
 
 protected:
     // 设置关卡的基本信息（如玩家位置、出口位置等）
@@ -65,12 +58,13 @@ class Level_0 : public ILevel
 protected:
     virtual void InitBasicData() override
     {
-        exitPos = make_pair(1, 1);
+        playerInfo = PlayerInfo({0, 0}, 20, 1, 3);
+        exitPos = make_pair(1, 5);
     }
 
     virtual void AddEnemy() override
     {
-
+        enemyInfoList.push_back(new NormalEnemyInfo(make_pair(3, 3)));
     }
 
     virtual void AddCollection() override
@@ -84,13 +78,15 @@ class Level_1 : public ILevel
 protected:
     virtual void InitBasicData() override
     {
-        playerInfo = PlayerInfo({19, 0}, 10, 1, 3);
+        playerInfo = PlayerInfo({19, 0}, 25, 1, 3);
         exitPos = make_pair(1, 1);
     }
 
     virtual void AddEnemy() override
     {
-
+        enemyInfoList.push_back(new NormalEnemyInfo(make_pair(6, 2)));
+        enemyInfoList.push_back(new NormalEnemyInfo(make_pair(18, 4)));
+        enemyInfoList.push_back(new NormalEnemyInfo(make_pair(0, 6)));
     }
 
     virtual void AddCollection() override

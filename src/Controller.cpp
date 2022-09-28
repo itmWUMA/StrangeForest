@@ -82,9 +82,7 @@ public:
       }
       
       // 关卡变化
-      if (status == PASS)
-         ++curLevelIndex;
-      else if (status == FINISH)
+      if (status == FINISH)
       {
          Player::FreeInstance();
          PrintUI();
@@ -92,6 +90,13 @@ public:
          EndGame();
          return 0;
       }
+      else if (status == PASS)
+         ++curLevelIndex;
+
+      // 清空当前关卡的剩余数据
+      for (auto enemy : enemyList)
+         delete enemy;
+      enemyList.clear();
 
       return 1;
    }
@@ -115,6 +120,8 @@ private:
    int curLevelIndex;
    // 玩家
    Player* player;
+   // 敌人集合
+   vector<IEnemy*> enemyList;
    // 当前状态
    enum Status
    {
@@ -166,18 +173,31 @@ private:
       // 初始化玩家信息
       InitPlayer(curLevel->playerInfo);
 
+      // 初始化敌人信息
+      InitEnemy(curLevel->enemyInfoList);
+
       // 初始化地图
       map.SetValue(curLevel->exitPos.first, curLevel->exitPos.second, 'E');
       map.SetValue(player->pos.first, player->pos.second, player->SYMBOL);
+      for (IEnemy* enemy : enemyList)
+      {
+         map.SetValue(enemy->pos.first, enemy->pos.second, enemy->GetSymbol());
+      }
    }
 
    // 初始化玩家
    void InitPlayer(const PlayerInfo& info)
    {
-      player->hp = info.hp;
-      player->pos = info.pos;
-      player->sight = info.sight;
-      player->step = info.step;
+      player = info.Parse();
+   }
+
+   // 初始化敌人
+   void InitEnemy(const vector<EnemyInfo*>& infoList)
+   {
+      for (auto info : infoList)
+      {
+         enemyList.push_back(info->Parse());
+      }
    }
 
    // 执行当前回合
@@ -190,6 +210,10 @@ private:
       --player->hp;
 
       // 敌人移动控制
+      for (IEnemy* enemy : enemyList)
+      {
+         Move(enemy->pos.first, enemy->pos.second, (Towards)enemy->MoveTowards(), enemy->step, enemy->GetSymbol());
+      }
 
       // 判定当前回合结果
       JudgeResult();
@@ -278,9 +302,21 @@ private:
          else
             status = PASS;
       }
-      // 步数用完 或 遭遇敌人
+      // 步数用完
       else if (player->hp <= 0)
          status = FAIL;
+      // 遭遇敌人
+      else
+      {
+         for (IEnemy* enemy : enemyList)
+         {
+            if (player->pos == enemy->pos)
+            {
+               status = FAIL;
+               break;
+            }
+         }
+      }
    }
 };
 Controller *Controller::instance = nullptr;

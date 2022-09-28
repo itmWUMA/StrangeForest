@@ -1,12 +1,16 @@
 #include "Controller.cpp"
 
 #include <iostream>
+#include <ctime>
 #include <Windows.h>
 using namespace std;
 
 int main(int argn, char** args)
 {
    system("title Strange Forest");
+
+   // 随机化种子
+   srand((unsigned int)time(NULL));
 
    // 获取控制器单例
    Controller* ctrl = Controller::GetInstance();
