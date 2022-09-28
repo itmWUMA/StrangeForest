@@ -29,7 +29,10 @@ public:
       cout << "=======================================" << endl;
 
       // 打印地图
-      map.PrintMap();
+      if (status == UNSTART)
+         map.PrintUnstartMap();
+      else
+         map.PrintGamingMap();
 
       cout << "=======================================" << endl;
 
@@ -46,14 +49,18 @@ public:
    }
 
    // 释放单例
-   void DeleteInstance()
+   void FreeInstance()
    {
+      // 释放所有关卡
+      for (ILevel* level : levelList)
+         delete level;
+
       delete instance;
       instance = nullptr;
    }
 
    // 开始关卡
-   void StartLevel()
+   int StartLevel()
    {
       // 加载关卡
       LoadLevel();
@@ -73,10 +80,20 @@ public:
          // 执行当前回合
          DoProcess(ipt);
       }
-
-
       
       // 关卡变化
+      if (status == PASS)
+         ++curLevelIndex;
+      else if (status == FINISH)
+      {
+         Player::FreeInstance();
+         PrintUI();
+         system("pause");
+         EndGame();
+         return 0;
+      }
+
+      return 1;
    }
 
    // 结束游戏
@@ -96,6 +113,8 @@ private:
    vector<ILevel*> levelList;
    // 当前关卡
    int curLevelIndex;
+   // 玩家
+   Player* player;
    // 当前状态
    enum Status
    {
@@ -118,17 +137,18 @@ private:
 
    Controller() : curLevelIndex(0), status(UNSTART)
    {
+      // 创建玩家
+      player = Player::GetInstance();
+
       // 创建关卡
       levelList.push_back(GenerateLevel(new Level_0));
+      levelList.push_back(GenerateLevel(new Level_1));
    }
 
    Controller(const Controller &) {}
 
    // 获取当前关卡
    inline ILevel* GetCurLevel() { return levelList[curLevelIndex]; }
-
-   // 获取玩家
-   inline Player* GetPlayer() { return GetCurLevel()->player; }
 
    // 创建关卡
    ILevel* GenerateLevel(ILevel* &&level) 
@@ -143,16 +163,27 @@ private:
       // 读取当前关卡
       auto curLevel = levelList[curLevelIndex];
 
+      // 初始化玩家信息
+      InitPlayer(curLevel->playerInfo);
+
       // 初始化地图
       map.SetValue(curLevel->exitPos.first, curLevel->exitPos.second, 'E');
-      map.SetValue(curLevel->player->pos.first, curLevel->player->pos.second, 'I');
+      map.SetValue(player->pos.first, player->pos.second, player->SYMBOL);
+   }
+
+   // 初始化玩家
+   void InitPlayer(const PlayerInfo& info)
+   {
+      player->hp = info.hp;
+      player->pos = info.pos;
+      player->sight = info.sight;
+      player->step = info.step;
    }
 
    // 执行当前回合
    void DoProcess(int ipt)
    {
       auto curLevel = GetCurLevel();
-      auto player = GetPlayer();
       
       // 玩家移动控制
       Move(player->pos.first, player->pos.second, (Towards)ipt, player->step, player->SYMBOL);
@@ -171,7 +202,7 @@ private:
       {
       case GAMEING:
          cout << "      Your time is limited\n   escape as quick as possible!" << endl;
-         cout << "          [Rest Step : " << levelList[curLevelIndex]->player->hp << "]\n";
+         cout << "          [Rest Step : " << player->hp << "]\n";
          cout << "  [1] Up   [2] Down  [3] Left  [4] Right" << endl;
          break;
 
@@ -180,7 +211,7 @@ private:
          break;
 
       case PASS:
-         cout << "      You are SAFE now!" << endl;
+         cout << "           You are SAFE now!" << endl;
          cout << "         [1] Continue    [0] End" << endl;
          break;
 
@@ -190,7 +221,7 @@ private:
          break;
 
       case FINISH:
-         cout << "         Congratulations, You Win！" << endl;
+         cout << "         Congratulations, You Win!" << endl;
          break;
 
       default:
@@ -238,11 +269,15 @@ private:
    void JudgeResult()
    {
       auto curLevel = GetCurLevel();
-      auto player = GetPlayer();
 
       // 到达出口
       if (player->pos == curLevel->exitPos)
-         status = PASS;
+      {
+         if (curLevelIndex + 1 == levelList.size())
+            status = FINISH;
+         else
+            status = PASS;
+      }
       // 步数用完 或 遭遇敌人
       else if (player->hp <= 0)
          status = FAIL;

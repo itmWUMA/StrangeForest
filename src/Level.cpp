@@ -9,6 +9,23 @@
 #include <vector>
 using namespace std;
 
+struct PlayerInfo
+{
+    // 位置
+    pair<int, int> pos;
+    // 生命（剩余移动步数）
+    int hp;
+    // 单次移动距离
+    int step;
+    // 视野范围
+    int sight;
+
+    PlayerInfo(pair<int, int> pos, int hp, int step, int sight) :
+        pos(pos), hp(hp), step(step), sight(sight) {}
+    PlayerInfo() :
+        pos({0, 0}), hp(10), step(1), sight(3) {}
+};
+
 // 关卡接口，派生关卡需实现内部方法
 class ILevel
 {
@@ -16,7 +33,7 @@ public:
     // 出口位置
     pair<int, int> exitPos;
     // 玩家信息
-    Player *player;
+    PlayerInfo playerInfo;
     // 敌人信息
     vector<IEnemy *> enemyList;
     // 道具信息
@@ -45,18 +62,30 @@ protected:
 
 class Level_0 : public ILevel
 {
-public:
-    ~Level_0()
-    {
-        delete player;
-        player = nullptr;
-    }
-
 protected:
     virtual void InitBasicData() override
     {
-        player = Player::GetInstance();
-        exitPos = make_pair(19, 19);
+        exitPos = make_pair(1, 1);
+    }
+
+    virtual void AddEnemy() override
+    {
+
+    }
+
+    virtual void AddCollection() override
+    {
+
+    }
+};
+
+class Level_1 : public ILevel
+{
+protected:
+    virtual void InitBasicData() override
+    {
+        playerInfo = PlayerInfo({19, 0}, 10, 1, 3);
+        exitPos = make_pair(1, 1);
     }
 
     virtual void AddEnemy() override

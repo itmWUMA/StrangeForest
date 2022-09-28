@@ -21,12 +21,12 @@ int main(int argn, char** args)
       ipt = ctrl->GetInput();    // 获取输入
 
       if (ipt == 1)              // 开始关卡
-         ctrl->StartLevel();     
+         ipt = ctrl->StartLevel();     
       else                       // 结束游戏
          ctrl->EndGame();
    } while (ipt);
    
-   ctrl->DeleteInstance();
+   ctrl->FreeInstance();
    system("pause");
    return 0;
 }

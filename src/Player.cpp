@@ -27,6 +27,12 @@ public:
         return instance;
     }
 
+    static void FreeInstance()
+    {
+        delete instance;
+        instance = nullptr;
+    }
+
 private:
     static Player* instance;
 
